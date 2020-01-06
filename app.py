@@ -8,6 +8,7 @@ import os
 
 app = Flask( __name__ )
 app.config['DATABASE_URL'] = os.environ['DATABASE_URL']
+API_KEY = os.environ['API_KEY']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 heroku = Heroku(app)
@@ -26,16 +27,21 @@ class ArrivalTime(db.Model):
 
 @app.route("/late", methods=["GET"])
 def post_to_db():
-    email = request.args.get('email')
-    indata = ArrivalTime(email)
-    print(email)
-    db.session.add(indata)
-    db.session.commit()
-    return 'Success!'
+    if request.args.get('API_KEY') == API_KEY:
+        email = request.args.get('email')
+        indata = ArrivalTime(email)
+        db.session.add(indata)
+        db.session.commit()
+        return 'Success!'
+    else:
+        return 'Bad API_KEY'
 
 @app.route("/list", methods=["GET"])
 def _slash_list():
-    return "<br />".join(f"{e.email}: {e.time}" for e in ArrivalTime.query.all())
+    if request.args.get('API_KEY') == API_KEY:
+        return "<br />".join(f"{e.email}: {e.time}" for e in ArrivalTime.query.all())
+    else:
+        return 'Bad API_KEY'
 
 if __name__ == ' __main__':
     app.debug = True
