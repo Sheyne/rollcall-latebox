@@ -1,12 +1,15 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 import sys
 import json
 from flask_heroku import Heroku
 from datetime import datetime
+import os
 
 app = Flask( __name__ )
+app.config.from_object(os.environ['DATABASE_URL'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 heroku = Heroku(app)
 db = SQLAlchemy(app)
 
@@ -24,17 +27,12 @@ class ArrivalTime(db.Model):
 
 @app.route("/late", methods=["GET"])
 def post_to_db():
-    indata = ArrivalTime(request.form['email'])
-    data = copy(indata. __dict__ )
-    del data["_sa_instance_state"]
-    try:
-        db.session.add(indata)
-        db.session.commit()
-    except Exception as e:
-        print("\n FAILED entry: {}\n".format(json.dumps(data)))
-        print(e)
-        sys.stdout.flush()
-    return 'Success! To enter more data, <a href="{}">click here!</a>'.format(url_for("enter_data"))
+    email = request.args.get('email')
+    indata = ArrivalTime(email)
+    print(email)
+    db.session.add(indata)
+    db.session.commit()
+    return 'Success!'
 
 if __name__ == ' __main__':
     app.debug = True
