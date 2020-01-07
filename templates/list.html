@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}
+List
+{% endblock %}
+
+{% block content %}
+  {% if error %}
+    <div class="alert alert-danger" role="alert">{{ error }}</div>
+  {% endif %}
+
+  {% if entries %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for email, time in entries %}
+        <tr>
+          <td>{{ email }}</td>
+          <td>{{ time.strftime("%d %B %Y, %H:%M:%S") }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+{% endblock %}

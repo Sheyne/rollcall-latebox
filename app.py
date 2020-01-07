@@ -27,21 +27,24 @@ class ArrivalTime(db.Model):
 
 @app.route("/late", methods=["GET"])
 def post_to_db():
-    if request.args.get('API_KEY') == API_KEY:
+    if not request.args.get('email'):
+        return render_template('late.html', error="Bad email")
+    elif request.args.get('API_KEY') == API_KEY:
         email = request.args.get('email')
         indata = ArrivalTime(email)
         db.session.add(indata)
         db.session.commit()
-        return 'Success!'
+        return render_template('late.html', success="Success")
     else:
-        return 'Bad API_KEY'
+        return render_template('late.html', error="Bad API_KEY")
 
 @app.route("/list", methods=["GET"])
 def _slash_list():
     if request.args.get('API_KEY') == API_KEY:
-        return "<br />".join(f"{e.email}: {e.time}" for e in ArrivalTime.query.all())
+        entries = ((e.email, e.time - datetime.timedelta(hours=8)) for e in ArrivalTime.query.all())
+        return render_template('list.html', entries=entries)
     else:
-        return 'Bad API_KEY'
+        return render_template('list.html', error='Bad API_KEY')
 
 if __name__ == ' __main__':
     app.debug = True

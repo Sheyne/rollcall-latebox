@@ -1,0 +1,9 @@
+:root {
+  --orange: #E28C05;
+  --dark-gray: #5F6062;
+  --light-gray: #999999;
+}
+
+.navbar {
+  background-color: var(--orange, #E28C05) !important;
+}
